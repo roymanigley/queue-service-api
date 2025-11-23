@@ -1,0 +1,70 @@
+{
+  "_models": {
+    "Company": {
+      "fields": {
+        "name": {
+          "type": "CharField",
+          "attributes": {
+            "required": true,
+            "max_length": 255
+          }
+        },
+        "company": {
+          "type": "Relationship",
+          "attributes": {
+            "required": true,
+            "cascade": true,
+            "relation": "Company"
+          }
+        }
+      }
+    },
+    "Queue": {
+      "fields": {
+        "name": {
+          "type": "CharField",
+          "attributes": {
+            "required": true,
+            "max_length": 255
+          }
+        }
+      }
+    },
+    "QueueEntry": {
+      "fields": {
+        "queue": {
+          "type": "Relationship",
+          "attributes": {
+            "required": true,
+            "cascade": true,
+            "relation": "Queue"
+          }
+        },
+        "position": {
+          "type": "IntegerField",
+          "attributes": {
+            "required": true
+          }
+        },
+        "start_waiting": {
+          "type": "DateTimeField",
+          "attributes": {
+            "required": true
+          }
+        },
+        "end_waiting": {
+          "type": "DateTimeField",
+          "attributes": {
+            "required": false
+          }
+        },
+        "description": {
+          "type": "TextField",
+          "attributes": {
+            "required": false
+          }
+        }
+      }
+    }
+  }
+}
