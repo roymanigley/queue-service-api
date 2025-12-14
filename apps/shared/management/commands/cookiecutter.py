@@ -1,8 +1,8 @@
+import copy
 import enum
 import json
 import os
 import re
-import copy
 from typing import List, Any
 
 import click

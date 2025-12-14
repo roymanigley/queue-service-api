@@ -1,0 +1,1 @@
+from apps.shared.permissions.strict_model_permission import StrictModelPermission

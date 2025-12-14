@@ -8,17 +8,25 @@ import tempfile
 load_dotenv('.django.env')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+DB_DIR = os.environ.get('DJANGO_DB_DIR', BASE_DIR)
 
+SECRET_KEY = os.getenv(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-i7d_4&2#m!ih$klw*sqfbl35_rwa3xdv76$5-0no%#)2fv4w(u'
+)
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET')
+# SECURITY WARNING: don't run with debug turned on in production!
+ALLOWED_HOSTS = os.getenv(
+    'DJANGO_ALLOWED_HOSTS', '*'
+).split(' ')
 
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'DJANGO_TRUSTED_ORIGINS', 'http://localhost:8000 http://127.0.0.1:8000'
+).split(' ')
+
+# Application definition
 DEBUG = os.environ.get('DJANGO_DEBUG').lower() == 'true'
 
-ALLOWED_HOSTS = os.environ.get(
-    'DJANGO_ALLOWED_HOSTS', 'localhost 127.0.0.1').split(' ')
-CSRF_TRUSTED_ORIGINS = os.environ.get(
-    'DJANGO_CSRF_TRUSTED_ORIGINS', 'http://localhost:8000 http://127.0.0.1:8000'
-).split(' ')
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -31,58 +39,40 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'oauth2_provider',
     'rest_framework',
-    'apps.oauth',
+    'apps.authentication',
     'apps.core',
     'apps.shared',
 ]
 
-AUTH_USER_MODEL = "oauth.Tenant"
-
-OAUTH2_PROVIDER = {
-    'OIDC_ENABLED': True,
-    'PKCE_REQUIRED': True,
-    'SCOPES': {
-        'openid': 'Open Id Connect',
-        'read': 'Read access',
-        'create': 'Create access',
-        'update': 'Update access',
-        'delete': 'Delete access',
-    },
-    'ALLOWED_REDIRECT_URI_SCHEMES': ['http', 'https'],
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 5 * 60
-}
+AUTH_USER_MODEL = "authentication.UserProfile"
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'oauth2_provider.backends.OAuth2Backend',
 )
 
-LOGIN_URL = '/admin/login/'
+LOGOUT_URL = '/api/auth/logout/'
+LOGIN_URL = '/api/auth/login/'
+LOGIN_REDIRECT_URL = '/auth/accounts/'
+LOGOUT_REDIRECT_URL = '/'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        'apps.oauth.oauth_authentication.OAuth2WithClientUserAuth',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'oauth2_provider.contrib.rest_framework.TokenMatchesOASRequirements',
-    )
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ]
 }
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Customer Queue',
-    'DESCRIPTION': 'Your project description',
+    'DESCRIPTION': f'''
+--- 
+**Login:** [POST] [{LOGIN_URL}]({LOGIN_URL})  
+**Logout:** [POST] [{LOGOUT_URL}]({LOGOUT_URL})
+    ''',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    'OAUTH2_FLOWS': [
-        "authorizationCode"
-    ],
-    'OAUTH2_AUTHORIZATION_URL': '/oauth/authorize/',
-    'OAUTH2_TOKEN_URL': '/oauth/token/',
-    'OAUTH2_REFRESH_URL': '/oauth/token/',
 }
 
 MIDDLEWARE = [
@@ -123,7 +113,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(DB_DIR, 'db.sqlite3'),
     }
 }
 

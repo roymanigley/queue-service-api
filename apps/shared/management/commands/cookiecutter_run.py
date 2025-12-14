@@ -1,11 +1,11 @@
-from argparse import ArgumentParser
-
-import click
 import json
 import os
 import shutil
 import tempfile
 import uuid
+from argparse import ArgumentParser
+
+import click
 from cookiecutter.main import cookiecutter
 from django.core.management.base import BaseCommand
 from git import Repo
