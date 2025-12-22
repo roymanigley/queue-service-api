@@ -30,7 +30,8 @@ class QueueViewSet(ModelViewSet):
         if company_id := data.get('company_id'):
             queryset = queryset.filter(company_id=company_id)
         queryset = self.paginate_queryset(queryset)
-        return self.get_paginated_response(queryset)
+        serializer = self.get_serializer(queryset, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @extend_schema('Find Queue By ID')
     def retrieve(self, request, *args, **kwargs):

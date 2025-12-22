@@ -5,6 +5,7 @@ services:
     ports:
       - 8000:8000
     environment:
+      DJANGO_DEBUG: "true"
       DJANGO_DB_DIR: "/var/data/app/db"
       DJANGO_ALLOWED_HOSTS: "queue-service-api.eutima.ch"
       DJANGO_TRUSTED_ORIGINS: "https://queue-service-api.eutima.ch http://localhost:4200 http://127.0.0.1:4200"

@@ -27,9 +27,10 @@ class CompanyViewSet(ModelViewSet):
         data = serializer.validated_data
         queryset = self.get_queryset()
         if search := data.get('search'):
-            queryset = queryset.filter(name__icontians=search)
+            queryset = queryset.filter(name__icontains=search)
         queryset = self.paginate_queryset(queryset)
-        return self.get_paginated_response(queryset)
+        serializer = self.get_serializer(queryset, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @extend_schema('Find Company By ID')
     def retrieve(self, request, *args, **kwargs):

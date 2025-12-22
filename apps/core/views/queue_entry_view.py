@@ -35,10 +35,13 @@ class QueueEntryViewSet(ModelViewSet):
             queryset = queryset.filter(queue_id=queue_id)
         if date := data.get('date'):
             queryset = queryset.filter(start_waiting=date)
-        if data.get('waiting_end_is_null'):
-            queryset = queryset.filter(end_waiting__isnull=True)
+        if data.get('waiting_end_is_null') is not None:
+            print( data.get('waiting_end_is_null'))
+            queryset = queryset.filter(end_waiting__isnull= data.get('waiting_end_is_null'))
+            print(queryset)
         queryset = self.paginate_queryset(queryset)
-        return self.get_paginated_response(queryset)
+        serializer = self.get_serializer(queryset, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @extend_schema('Find Queue Entry By ID')
     def retrieve(self, request, *args, **kwargs):
