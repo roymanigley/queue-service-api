@@ -1,9 +1,12 @@
+import uuid
+
 from django.db import models
 
 from apps.core.models.abstracts import AuditableModel
 
 
 class QueueEntry(AuditableModel):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     queue = models.ForeignKey('Queue', on_delete=models.CASCADE)
     description = models.TextField()
     start_waiting = models.DateTimeField(auto_now_add=True)
