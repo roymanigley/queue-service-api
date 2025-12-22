@@ -1,6 +1,8 @@
 import datetime
 
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from rest_framework import permissions
+from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 
 from apps.authentication.models import UserProfile
@@ -47,6 +49,11 @@ class QueueEntryViewSet(ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
+    @extend_schema('Find Queue Entry By ID - No Login Required', tags=['Public'])
+    @action(url_path='public', detail=True, permission_classes=[])
+    def retrieve_public(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
     @extend_schema('Update Queue Entry Partial')
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
@@ -61,4 +68,6 @@ class QueueEntryViewSet(ModelViewSet):
 
     def get_queryset(self):
         user: UserProfile = get_current_user()
+        if self.action == 'retrieve_public':
+            return super().get_queryset()
         return super().get_queryset().filter(queue__company__organization=user.organization)
